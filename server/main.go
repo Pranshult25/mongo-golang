@@ -3,12 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
+	// "net/http"
+	// "net/http"
+	// "os"
+	// "log"
+
 	"github.com/gofiber/fiber/v2"
+	// "github.com/gorilla/handlers"
+
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/pranshult25/queriesportalbackend/common"
 	"github.com/pranshult25/queriesportalbackend/router"
+	// "github.com/rs/cors"
 )
 
 func main() {
@@ -21,6 +29,8 @@ func main() {
 }
 
 func run() error {
+
+	// mux := http.NewServeMux()
 	// init env
 	err := common.LoadEnv()
 	if err != nil {
@@ -44,17 +54,32 @@ func run() error {
 	// add basic middleware
 	app.Use(logger.New())
 	app.Use(recover.New())
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000, http://localhost:8080",
+		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowMethods: "Post, GET, DELETE, OPTIONS",
+		AllowCredentials: true,
+		MaxAge: 86400,
+	}))
 
+	// app.Use(c.Handler()))
+
+	
+	// app.Use(cors.ConfigDefault.AllowCredentials == true)
+	
 	// add routes
 	router.Router(app)
+	
+	
 
 	// start server
 	var port string
 	if port = os.Getenv("PORT"); port == "" {
-		port = "3000"
+		port = "4000"
 	}
 	app.Listen(":" + port)
+
+
 
 	return nil
 }
